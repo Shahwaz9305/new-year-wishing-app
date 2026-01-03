@@ -1,10 +1,18 @@
 const express = require('express');
 const axios = require('axios');
+const path = require('path'); // Add this
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Use environment port
 
 app.use(express.json());
-app.use(express.static('public')); 
+
+// Updated for Vercel: Use path.join to ensure the public folder is found
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Explicitly serve index.html on the root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1456915026114777149/9O263RGwSonMZXTPWWOWnOp6bew0OTy013LQcSbLqDQBe8gwoTsT3sRahzejOkN2cxqY';
 

