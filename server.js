@@ -48,3 +48,5 @@ app.post('/track-location', async (req, res) => {
 });
 
 app.listen(port, () => console.log(`Server: http://localhost:${port}`));
+
+module.exports = app;
